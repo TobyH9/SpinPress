@@ -1,7 +1,0 @@
-{
-    "editor.formatOnSave": true,
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    },
-    "python.defaultInterpreterPath": "/Users/tobyhallett/miniconda3/envs/dataenv/bin/python"
-}
