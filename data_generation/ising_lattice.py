@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import fire
 
 
 class IsingLattice:
@@ -14,10 +13,14 @@ class IsingLattice:
         self.lattice = np.random.choice(
             [-1, 1], size=self.dimensions
         )  # randomly choose a lattice with dimensions x and y
-        self.unfixed_entries = []
+        self.coords_unfixed_entries = []
+        self.unfixed_entries = np.zeros_like(self.lattice)
+        if not self.coords_unfixed_entries:
+            for i in self.coords_unfixed_entries:
+                self.unfixed_entries[tuple(i)] = 1
         self.number_fixed_entries = x * y - len(
-            self.unfixed_entries
-        )  # number of unfixed entries
+            self.coords_unfixed_entries
+        )  # number of fixed entries
 
     def find_neighbours(self, spin_to_flip):
         i = spin_to_flip[0]
@@ -45,7 +48,7 @@ class IsingLattice:
         return neighbours
 
     def energy_change(self):
-        for s in self.unfixed_entries:
+        for s in self.coords_unfixed_entries:
             neighbours = self.find_neighbours(s)
             E_old = 0
             E_new = 0
@@ -71,20 +74,20 @@ class IsingLattice:
 
     def simulate(self, n):
         spins = np.array(
-            [self.lattice[tuple(i)] for i in self.unfixed_entries]
+            [self.lattice[tuple(i)] for i in self.coords_unfixed_entries]
         )  # get the spins of the unfixed entries
         for i in range(n):
             self.energy_change()
             updated_spins = np.array(
-                [self.lattice[tuple(i)] for i in self.unfixed_entries]
+                [self.lattice[tuple(i)] for i in self.coords_unfixed_entries]
             )  # get the spins of the unfixed entries
             spins = spins + updated_spins
         spins = (1 / n) * spins  # get the average of the spins
         for i in range(len(spins)):
             if spins[i] > 0.1:
-                self.lattice[tuple(self.unfixed_entries[i])] = 1
+                self.lattice[tuple(self.coords_unfixed_entries[i])] = 1
             elif spins[i] < -0.1:
-                self.lattice[tuple(self.unfixed_entries[i])] = -1
+                self.lattice[tuple(self.coords_unfixed_entries[i])] = -1
             else:
                 print("The system is not in equilibrium")
         return self.lattice
@@ -93,7 +96,3 @@ class IsingLattice:
         plt.imshow(self.lattice, cmap="bwr", interpolation="nearest")
         plt.colorbar(ticks=[-1, 1])
         plt.show()
-
-
-if __name__ == "__main__":
-    fire.Fire(IsingLattice)
